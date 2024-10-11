@@ -18,7 +18,8 @@ const AssignmentSchema = new Schema<AssignmentType>({
 
   task: {
      type: String, 
-     required: true
+     required: true,
+     unique :true
      },
   admin: { 
     type: Schema.Types.ObjectId, 

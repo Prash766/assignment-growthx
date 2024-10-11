@@ -7,7 +7,7 @@ import { Assignment } from "../models/assignment.model";
 import { Admin } from "../models/admin.models";
 
 
-const tokenOptions = {
+export const tokenOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   maxAge: 846400000,
@@ -87,12 +87,22 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const uploadAssignment =asyncHandler( async (req, res) => {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json({
+      message: error.array(),
+    });
+  }
   try {
     const { task, adminId } = req.body;
     const userId = req.user;
     const assignment = new Assignment({ userId, task, admin: adminId });
     await assignment.save();
-    return res.status(201).json({ message: 'Assignment uploaded successfully' });
+    return res.status(201).json({ 
+      message: 'Assignment uploaded successfully',
+      assignment
+
+     });
   } catch (error) {
     res.status(500).json({ message: 'Error uploading assignment', error });
   }

@@ -14,8 +14,10 @@ connectDB()
 
 
 import userRouter from './routes/user.routes'
+import adminRouter from './routes/admin.routes'
 import errorMiddleware from "./middlewares/error";
 app.use('/api/v1/users', userRouter)
+app.use('/api/v1/admin' , adminRouter)
 
 
 
