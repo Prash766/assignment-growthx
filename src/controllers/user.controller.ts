@@ -3,6 +3,9 @@ import { User } from "../models/user.model";
 import ApiError from "../utils/ApiError";
 import asyncHandler from "../utils/asyncHandler";
 import jwt from "jsonwebtoken";
+import { Assignment } from "../models/assignment.model";
+import { Admin } from "../models/admin.models";
+
 
 const tokenOptions = {
   httpOnly: true,
@@ -12,6 +15,7 @@ const tokenOptions = {
 
 const registerUser = asyncHandler(async (req, res) => {
   const errors = validationResult(req)
+
   if (!errors.isEmpty()) {
     return res.status(400).json({
       message: errors.array(),
@@ -26,7 +30,7 @@ const registerUser = asyncHandler(async (req, res) => {
     user = await User.create(req.body);
     const token = jwt.sign(
       {
-        userId: user.id,
+        id: user.id,
       },
       process.env.JWT_SECRET_KEY as string,
       {
@@ -74,7 +78,7 @@ const loginUser = asyncHandler(async (req, res) => {
       expiresIn: "1d",
     }
   );
-  res.cookie("auth_token", token, tokenOptions);
+  res.cookie("token", token, tokenOptions);
   return res.status(200).json({
     success:true,
     message:"User logged in Successfully",
@@ -82,9 +86,32 @@ const loginUser = asyncHandler(async (req, res) => {
   })
 });
 
+const uploadAssignment =asyncHandler( async (req, res) => {
+  try {
+    const { task, adminId } = req.body;
+    const userId = req.user;
+    const assignment = new Assignment({ userId, task, admin: adminId });
+    await assignment.save();
+    return res.status(201).json({ message: 'Assignment uploaded successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error uploading assignment', error });
+  }
+});
+const getAdmins = asyncHandler( async (req, res) => {
+  try {
+    const admins = await Admin.find({}, 'name email');
+    return res.status(200).json({
+      admins:admins
 
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching admins', error });
+  }
+});
 
 export {
     registerUser,
-    loginUser
+    loginUser,
+    uploadAssignment,
+    getAdmins
 }
