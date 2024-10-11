@@ -3,7 +3,7 @@ import 'dotenv/config'
 
 const connectDB= async()=>{
     try {
-        const res = await mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string)
+        const res = await mongoose.connect(`${process.env.MONGODB_CONNECTION_STRING as string}/portalDB`)
         console.log(`Db connected to ${res.connections[0].host} to the port ${res.connections[0].port}`)
 
     } catch (error) {

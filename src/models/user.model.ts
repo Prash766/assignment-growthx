@@ -3,7 +3,9 @@ import bcrypt from 'bcrypt'
 export type UserType  = {
     email : string,
     password:string,
-    fullName:string
+    fullName:string,
+    isPasswordValid(plainPassword: string): Promise<boolean>;
+
 }
 
 
@@ -31,6 +33,11 @@ UserSchema.pre('save' , async function(next){
 next()
     
 })
+
+UserSchema.methods.isPasswordValid= async function(password:string): Promise<boolean>{
+    return await bcrypt.compare(password , this.password)
+
+}
 
 
 
