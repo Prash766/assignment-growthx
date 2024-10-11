@@ -4,22 +4,36 @@ import { Admin } from '../models/admin.models';
 import { Assignment } from '../models/assignment.model';
 import { tokenOptions } from './user.controller';
 import asyncHandler from '../utils/asyncHandler';
+import { validationResult } from 'express-validator';
 
 
  const registerAdmin = asyncHandler( async(req, res) => {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json({
+        message: error.array(),
+      });
+    }
+
   try {
-    const { name, email, password } = req.body;
-    const admin = new Admin({ name, email, password });
+    const { fullName, email, password } = req.body;
+    const admin = new Admin({ fullName, email, password });
     await admin.save();
     const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET_KEY as string, { expiresIn: '1d' });
     res.cookie("token" , token , tokenOptions)
-    res.status(201).json({ message: 'Admin registered successfully' });
+    res.status(200).json({ message: 'Admin registered successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Error registering admin', error });
+    res.status(400).json({ message: 'Error registering admin', error });
   }
 })
 
  const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
+    const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json({
+      message: error.array(),
+    });
+  }
   try {
     const { email, password } = req.body;
     const admin = await Admin.findOne({ email });
@@ -33,24 +47,25 @@ import asyncHandler from '../utils/asyncHandler';
         message:"User logged in Successfully"
     })
   } catch (error) {
-    res.status(500).json({ message: 'Error logging in', error });
+    res.status(400).json({ message: 'Error logging in', error });
   }
 })
 
  const getAssignments = asyncHandler(async (req, res) => {
   try {
     const adminId = req.user;
-    const assignments = await Assignment.find({ admin: adminId }).populate('userId', 'name');
+    const assignments = await Assignment.find({ admin: adminId }).populate('userId', 'fullName');
     return res.status(200).json({
         success:true,
         assignments:assignments
     })
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching assignments', error });
+    res.status(400).json({ message: 'Error fetching assignments', error });
   }
 })
 
  const acceptAssignment = asyncHandler(async (req, res) => {
+ 
   try {
     const { id } = req.params;
     const assignment = await Assignment.findByIdAndUpdate(id, { status: 'accepted' }, { new: true });
@@ -59,11 +74,12 @@ import asyncHandler from '../utils/asyncHandler';
     }
     res.status(200).json({ message: 'Assignment accepted successfully', assignment });
   } catch (error) {
-    res.status(500).json({ message: 'Error accepting assignment', error });
+    res.status(400).json({ message: 'Error accepting assignment', error });
   }
 })
 
  const rejectAssignment = asyncHandler(async(req, res) => {
+ 
   try {
     const { id } = req.params;
     const assignment = await Assignment.findByIdAndUpdate(id, { status: 'rejected' }, { new: true });
@@ -72,7 +88,7 @@ import asyncHandler from '../utils/asyncHandler';
     }
     res.json({ message: 'Assignment rejected successfully', assignment });
   } catch (error) {
-    res.status(500).json({ message: 'Error rejecting assignment', error });
+    res.status(400).json({ message: 'Error rejecting assignment', error });
   }
 })
 
