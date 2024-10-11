@@ -6,15 +6,15 @@ import { Admin } from "../models/admin.models";
 const router = Router()
 
 router.route("/register").post([
-check("email", "Enter the Email").isString(),
-check("password", "Password should of minimum 6 CHaracter or more than that"),
+check("email", "Enter the Email").isEmail(),
+check('password', 'Password should be a minimum of 6 characters').isLength({ min: 6 }),
 check("fullName", "Enter the FullName").isString()
 ], 
 registerUser)
 
 router.route("/login").post([
-    check("password", "Password should of minimum 6 CHaracter or more than that"),
-    check("email", "Enter the Email").isString(),
+    check('password', 'Password should be a minimum of 6 characters').isLength({ min: 6 }),
+    check("email", "Enter the Email").isEmail(),
 ],
 loginUser
 

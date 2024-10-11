@@ -1,16 +1,15 @@
-// src/models/Admin.ts
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 
 export type AdminType= {
-  name: string;
+  fullName: string;
   email: string;
   password: string;
   isPasswordValid(password: string): Promise<boolean>;
 }
 
 const AdminSchema = new Schema<AdminType>({
-  name: { 
+  fullName: { 
     type: String, 
     required: true },
   email: {
