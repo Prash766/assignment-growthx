@@ -8,7 +8,6 @@ export type UserType  = {
 
 }
 
-
 const UserSchema = new Schema<UserType>({
     email:{
         type:String,
@@ -24,6 +23,7 @@ const UserSchema = new Schema<UserType>({
         type:String,
         required:true
     }
+
 
 }, {timestamps:true})
 
