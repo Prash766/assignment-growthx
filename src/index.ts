@@ -7,15 +7,19 @@ const app = express()
 app.use(cors()) //mention the Origin Frontend URL to bypass the Cors Error
 app.use(express.json())
 app.use(cookieParser())
-app.use(express.urlencoded())
+app.use(express.urlencoded({extended:true}))
 
 
 connectDB()
 
 
 import userRouter from './routes/user.routes'
+import errorMiddleware from "./middlewares/error";
 app.use('/api/v1/users', userRouter)
 
+
+
+app.use(errorMiddleware)
 
 app.listen(4000 , ()=>{
     console.log("Server is running on port 4000")
